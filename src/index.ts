@@ -19,14 +19,10 @@ export const find_channel_urls = async (keywords: string, limit: number) => {
 
         let results: string[] = [];
 
-
         do{
 
-          let scrollable = await autoScroll(page, 2_000);
-          console.log(scrollable);
-          
-          if(!scrollable) break;
-
+          await autoScroll(page, 2_000);
+         
           const el = await page.$(selector);
 
         
@@ -46,12 +42,15 @@ export const find_channel_urls = async (keywords: string, limit: number) => {
 
           console.clear();
           console.log("Channels Found: " + results.length);
-          
+      
+
+          //if no more result message comes up, abort
+          if(await page.$('#message')) break;
+
         }while(limit>results.length);
 
         
         
-        // fs.writeFileSync('data.html', html as string) 
         await browser.close();
 
         return results;
@@ -152,11 +151,15 @@ export const get_channel_stats = async (urls: string[], browser: Browser) => {
 
           if(upload_date_text.includes('week') || upload_date_text.includes('month') || upload_date_text.includes('year')) eligible = false;
 
+          await page.waitForSelector('#text');
+
+          let name = await (await page.$('#text'))?.evaluate(v => v.innerHTML);
+
           results.push({
             url: url.replace('/videos', ''),
             subscribers: convertStringToNumber(subscriber_text),
             eligible,
-            name: ''
+            name
           })
         }catch(err){
         }
@@ -229,7 +232,6 @@ async function autoScroll(page: Page, limit: number) {
     });
   }, limit);
 
- return !(await isEndOfPageReached(page))
 }
 
 function convertStringToNumber(str: string | undefined) {
@@ -256,18 +258,4 @@ function convertStringToNumber(str: string | undefined) {
     }
   } else {
   }
-}
-
-async function isEndOfPageReached(page:Page): Promise<boolean> {
-  return await page.evaluate(async () => {
-      const scrollHeight = document.documentElement.scrollHeight;
-      const scrollTop = document.documentElement.scrollTop;
-      const clientHeight = document.documentElement.clientHeight;
-
-      if (scrollHeight === scrollTop + clientHeight) {
-        return true;
-      } else {
-        return false;
-      }
-  });
 }
