@@ -78,7 +78,7 @@ export const sort_channel_urls = async (urls: string []) => {
 
       schedule_buffer.push(urls[i]);
 
-      if(schedule_index%20 === 0){
+      if(schedule_index%Math.ceil(urls.length/10) === 0){
         //schedule tasks here
 
         let promise = get_channel_stats(schedule_buffer, browser);
