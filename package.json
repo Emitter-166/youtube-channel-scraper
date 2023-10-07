@@ -11,9 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "puppeteer": "^21.3.5",
-    "readline-sync": "^1.4.10",
-    "scrape-youtube": "^2.4.0",
-    "youtube-scrapper": "^1.4.0"
+    "readline-sync": "^1.4.10"
   },
   "devDependencies": {
     "@types/readline-sync": "^1.4.5"
